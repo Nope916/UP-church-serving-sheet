@@ -63,20 +63,15 @@
     </label>
 
     <label>
-      搜尋：
-      <input id="personFilter"
-             type="text"
-             placeholder="輸入名字…"
-             list="personList"
-             autocomplete="off">
+      搜尋（打字即時標記）：
+      <input id="personFilter" type="text" placeholder="輸入任一字…" autocomplete="off">
     </label>
-
-    <datalist id="personList"></datalist>
 
     <button id="clearBtn" type="button">清除</button>
 
     <span id="occCount">出現次數：0</span>
     <span id="dayCount">有幾天：0</span>
+    <span id="hitPeople" style="margin-left:8px;">命中人數：0</span>
   </div>
 
   <div class="table-wrap">
@@ -320,7 +315,7 @@ const filterInput = document.getElementById("personFilter");
 const clearBtn = document.getElementById("clearBtn");
 const occCount = document.getElementById("occCount");
 const dayCount = document.getElementById("dayCount");
-const datalist = document.getElementById("personList");
+const hitPeople = document.getElementById("hitPeople");
 
 function norm(s){
   return String(s||"").replace(/\s+/g," ").trim();
@@ -373,39 +368,7 @@ function clearHighlight(){
   table.querySelectorAll("tbody tr").forEach(tr=>tr.classList.remove("row-hit"));
   occCount.textContent = "出現次數：0";
   dayCount.textContent = "有幾天：0";
-}
-
-function applyHighlight(name){
-  clearHighlight();
-  if(!name) return;
-
-  let occ = 0;
-  const days = new Set();
-
-  table.querySelectorAll("tbody tr").forEach(tr=>{
-    const tds = tr.querySelectorAll("td");
-    if(!tds.length) return;
-
-    const date = norm(tds[0].textContent);
-    let hitRow = false;
-
-    tds.forEach((td,i)=>{
-      if(i===0) return;
-      if(cellHasName(td.textContent, name)){
-        td.classList.add("highlight");
-        occ++;
-        hitRow = true;
-      }
-    });
-
-    if(hitRow){
-      tr.classList.add("row-hit");
-      if(date) days.add(date);
-    }
-  });
-
-  occCount.textContent = `出現次數：${occ}`;
-  dayCount.textContent = `有幾天：${days.size}`;
+  hitPeople.textContent = "命中人數：0";
 }
 
 function getHeaders(){
@@ -420,6 +383,7 @@ function buildNameList(){
     const tds = Array.from(tr.children).filter(el => el.tagName === "TD");
     if(!tds.length) return;
 
+    // 跳過春節暫停列（colspan 很大）
     if(tds.length >= 2 && (tds[1].colSpan || 1) > 1) return;
 
     let col = 0;
@@ -454,95 +418,99 @@ function buildNameList(){
 
 const allNames = buildNameList();
 
-function findMatches(input){
-  const q = norm(input).toLowerCase();
-  if(!q) return [];
-  return allNames.filter(n => n.toLowerCase().includes(q));
-}
-
-/* select dropdown */
-function renderSelect(filterText){
-  const keep = norm(filterText).toLowerCase();
+/* 建立 select 名單（全名單，不跟 input 互相綁死） */
+function fillSelect(){
   while(select.options.length > 1) select.remove(1);
-
-  allNames
-    .filter(n => !keep || n.toLowerCase().includes(keep))
-    .forEach(n=>{
-      const opt = document.createElement("option");
-      opt.value = n;
-      opt.textContent = n;
-      select.appendChild(opt);
-    });
-}
-
-/* datalist autocomplete */
-function renderDatalist(){
-  datalist.innerHTML = "";
   allNames.forEach(n=>{
     const opt = document.createElement("option");
     opt.value = n;
-    datalist.appendChild(opt);
+    opt.textContent = n;
+    select.appendChild(opt);
   });
 }
+fillSelect();
 
-renderSelect("");
-renderDatalist();
-
-/* events */
-select.addEventListener("change", () => {
-  filterInput.value = select.value || "";
-  applyHighlight(select.value);
-});
-
-filterInput.addEventListener("input", () => {
-  const v = norm(filterInput.value);
-
-  if(allNames.includes(v)){
-    select.value = v;
-    applyHighlight(v);
-    return;
-  }
-
-  renderSelect(filterInput.value);
+/* 你要的：打一個字就 highlight 多個人 */
+function applyHighlightMany(names){
   clearHighlight();
-});
+  const list = Array.from(new Set((names||[]).map(norm).filter(Boolean)));
+  if(!list.length) return;
 
-filterInput.addEventListener("keydown", (e) => {
-  if(e.key !== "Enter") return;
+  let occ = 0;
+  const days = new Set();
 
-  const v = norm(filterInput.value);
-  if(!v) return;
+  table.querySelectorAll("tbody tr").forEach(tr=>{
+    const tds = Array.from(tr.querySelectorAll("td"));
+    if(!tds.length) return;
 
-  if(allNames.includes(v)){
-    select.value = v;
-    applyHighlight(v);
-    return;
-  }
+    const date = norm(tds[0].textContent);
+    let hitRow = false;
 
-  const matches = findMatches(v);
+    // 從第 2 格開始掃（跳過日期）
+    for(let i=1;i<tds.length;i++){
+      const td = tds[i];
+      const text = td.textContent;
 
-  if(matches.length === 1){
-    const name = matches[0];
-    filterInput.value = name;
-    renderSelect("");
-    select.value = name;
-    applyHighlight(name);
-    return;
-  }
+      // 任何一個名字命中就標記該格
+      let hitCell = false;
+      for(const name of list){
+        if(cellHasName(text, name)){
+          hitCell = true;
+          break;
+        }
+      }
 
-  if(matches.length > 1){
-    renderSelect(v);
+      if(hitCell){
+        td.classList.add("highlight");
+        occ++;
+        hitRow = true;
+      }
+    }
+
+    if(hitRow){
+      tr.classList.add("row-hit");
+      if(date) days.add(date);
+    }
+  });
+
+  occCount.textContent = `出現次數：${occ}`;
+  dayCount.textContent = `有幾天：${days.size}`;
+  hitPeople.textContent = `命中人數：${list.length}`;
+}
+
+/* input：即時搜尋（含任一字就算） */
+filterInput.addEventListener("input", () => {
+  const q = norm(filterInput.value).toLowerCase();
+
+  // 空字串 -> 清掉
+  if(!q){
     select.value = "";
     clearHighlight();
     return;
   }
 
-  clearHighlight();
+  // 找出「名字包含 q」的所有人
+  const matches = allNames.filter(n => n.toLowerCase().includes(q));
+
+  // 你說「反正就 highlight 全部」：就算很多人也照亮
+  select.value = "";
+  applyHighlightMany(matches);
 });
 
+/* select：選單選單一人（精準 highlight） */
+select.addEventListener("change", () => {
+  const v = norm(select.value);
+  filterInput.value = v;      // 同步填回 input，方便使用者看
+  if(!v){
+    clearHighlight();
+    return;
+  }
+  applyHighlightMany([v]);
+});
+
+/* clear */
 clearBtn.addEventListener("click", () => {
   filterInput.value = "";
-  renderSelect("");
   select.value = "";
   clearHighlight();
 });
