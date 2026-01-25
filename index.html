@@ -67,10 +67,10 @@
       <input id="personFilter"
              type="text"
              placeholder="輸入名字…"
-             list="personList">
+             list="personList"
+             autocomplete="off">
     </label>
 
-    <!-- autocomplete dropdown -->
     <datalist id="personList"></datalist>
 
     <button id="clearBtn" type="button">清除</button>
@@ -81,7 +81,7 @@
 
   <div class="table-wrap">
     <table id="roster">
-          <thead>
+      <thead>
         <tr>
           <th>日期</th>
           <th>會前禱告</th>
@@ -454,6 +454,12 @@ function buildNameList(){
 
 const allNames = buildNameList();
 
+function findMatches(input){
+  const q = norm(input).toLowerCase();
+  if(!q) return [];
+  return allNames.filter(n => n.toLowerCase().includes(q));
+}
+
 /* select dropdown */
 function renderSelect(filterText){
   const keep = norm(filterText).toLowerCase();
@@ -483,7 +489,10 @@ renderSelect("");
 renderDatalist();
 
 /* events */
-select.addEventListener("change", () => applyHighlight(select.value));
+select.addEventListener("change", () => {
+  filterInput.value = select.value || "";
+  applyHighlight(select.value);
+});
 
 filterInput.addEventListener("input", () => {
   const v = norm(filterInput.value);
@@ -495,6 +504,39 @@ filterInput.addEventListener("input", () => {
   }
 
   renderSelect(filterInput.value);
+  clearHighlight();
+});
+
+filterInput.addEventListener("keydown", (e) => {
+  if(e.key !== "Enter") return;
+
+  const v = norm(filterInput.value);
+  if(!v) return;
+
+  if(allNames.includes(v)){
+    select.value = v;
+    applyHighlight(v);
+    return;
+  }
+
+  const matches = findMatches(v);
+
+  if(matches.length === 1){
+    const name = matches[0];
+    filterInput.value = name;
+    renderSelect("");
+    select.value = name;
+    applyHighlight(name);
+    return;
+  }
+
+  if(matches.length > 1){
+    renderSelect(v);
+    select.value = "";
+    clearHighlight();
+    return;
+  }
+
   clearHighlight();
 });
 
