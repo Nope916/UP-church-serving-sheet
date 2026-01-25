@@ -1,0 +1,443 @@
+<div style="margin-bottom:16px;">
+<label>
+  選擇同工：
+  <select id="personSelect">
+    <option value="">（請選擇）</option>
+  </select>
+</label>
+
+<label style="margin-left:10px;">
+  搜尋：
+  <input id="personFilter" type="text" placeholder="輸入名字…" style="padding:6px 8px; font-size:14px;">
+</label>
+
+
+  <button id="clearBtn" type="button">清除</button>
+
+  <span id="occCount" style="margin-left:12px;">出現次數：0</span>
+  <span id="dayCount" style="margin-left:12px;">有幾天：0</span>
+</div>
+
+<style>
+  .row-hit td { background: #E8F2FF; }          /* 淡黃：整列提示 */
+  td.highlight { background: #fff2a8; font-weight: 600; }  /* 深黃：命中格 */
+  .row-hit td.highlight { background: #fff2a8; } /* 確保深黃不被蓋掉 */
+</style>
+
+<table id="roster">
+  <thead>
+    <tr>
+      <th>日期</th>
+      <th>會前禱告</th>
+      <th>講員</th>
+      <th>敬拜主領</th>
+      <th>敬拜Vocal</th>
+      <th>樂團</th>
+      <th>報告</th>
+      <th>擘餅</th>
+      <th>投影</th>
+      <th>總音控</th>
+      <th>架設直播</th>
+      <th>招待奉獻</th>
+      <th>兒主老師</th>
+      <th>備註</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>2026-01-04</td>
+      <td>盈君</td>
+      <td>高詩清牧師</td>
+      <td>文祺、以帆</td>
+      <td>小以琳</td>
+      <td>琴:伶安｜吉:宗明｜鼓:睿甫｜斯:季如</td>
+      <td>昶翰</td>
+      <td>盈君、宗明</td>
+      <td>凱鈞</td>
+      <td>至忠</td>
+      <td>莞茹</td>
+      <td>樂樂、玠勻</td>
+      <td>可馨</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>2026-01-11</td>
+      <td>雅親</td>
+      <td>高詩清牧師</td>
+      <td>可馨、宗明</td>
+      <td>盈君</td>
+      <td>琴:遠晟｜吉:昶翰｜鼓:儇齊｜斯:響萱</td>
+      <td>文祺</td>
+      <td></td>
+      <td>薰聲</td>
+      <td>欣仁</td>
+      <td>萬隆</td>
+      <td>季如</td>
+      <td>凱鈞</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>2026-01-18</td>
+      <td>莞茹</td>
+      <td>李惠知牧師</td>
+      <td>以帆、至忠、儇齊、為聖</td>
+      <td></td>
+      <td>琴:可馨｜吉:紹華｜鼓:睿甫｜斯:至忠</td>
+      <td>宗明</td>
+      <td></td>
+      <td>莞茹</td>
+      <td>宇睿</td>
+      <td>薰聲</td>
+      <td>盈君</td>
+      <td>昶翰</td>
+      <td>牧養同工會 15:00</td>
+    </tr>
+
+    <tr>
+      <td>2026-01-25</td>
+      <td>季如</td>
+      <td>謝尚儒傳道</td>
+      <td>伶安</td>
+      <td>孟璇、昶翰</td>
+      <td>琴:睿甫｜吉:文祺｜鼓:為聖｜斯:以帆</td>
+      <td>惠知</td>
+      <td></td>
+      <td>湘絨</td>
+      <td>至忠</td>
+      <td>欣仁</td>
+      <td>雅親</td>
+      <td>盈君</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>2026-02-01</td>
+      <td>孟璇</td>
+      <td>高詩清牧師</td>
+      <td>文祺</td>
+      <td>紹華、榕榕</td>
+      <td>琴:遠晟｜吉:以帆｜鼓:儇齊｜斯:響萱</td>
+      <td>昶翰</td>
+      <td>昶翰、莞茹</td>
+      <td>欣仁</td>
+      <td>睿甫</td>
+      <td>萬隆</td>
+      <td>湘絨</td>
+      <td>宇睿</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>2026-02-08</td>
+      <td>凱鈞</td>
+      <td>李惠知牧師</td>
+      <td>可馨、儇齊</td>
+      <td>愛真、樂樂、玠勻、予希、宜佑、雅筑</td>
+      <td>琴:為聖｜吉:紹華｜鼓:睿甫｜斯:季如</td>
+      <td>文祺</td>
+      <td></td>
+      <td>盈君</td>
+      <td>萬隆</td>
+      <td>欣仁</td>
+      <td>孟璇</td>
+      <td>莞茹</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>2026-02-15</td>
+      <td colspan="13">春節主日（暫停）</td>
+    </tr>
+
+    <tr>
+      <td>2026-02-22</td>
+      <td>雅親</td>
+      <td>蘇麗容牧師</td>
+      <td>宗明</td>
+      <td>凱鈞、盈君</td>
+      <td>琴:可馨｜吉:文祺｜鼓:為聖｜斯:以帆</td>
+      <td>惠知</td>
+      <td></td>
+      <td>薰聲</td>
+      <td>欣仁</td>
+      <td>莞茹</td>
+      <td>季如</td>
+      <td>小以琳</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>2026-03-01</td>
+      <td>盈君</td>
+      <td>高詩清牧師</td>
+      <td>文祺、以帆</td>
+      <td>小以琳</td>
+      <td>琴:伶安｜吉:宗明｜鼓:睿甫｜斯:季如</td>
+      <td>昶翰</td>
+      <td></td>
+      <td>凱鈞</td>
+      <td>至忠</td>
+      <td>莞茹</td>
+      <td>樂樂、玠勻</td>
+      <td>可馨</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>2026-03-08</td>
+      <td>雅親</td>
+      <td>高詩清牧師</td>
+      <td>可馨、宗明</td>
+      <td>盈君</td>
+      <td>琴:遠晟｜吉:昶翰｜鼓:儇齊｜斯:響萱</td>
+      <td>文祺</td>
+      <td>雅親、宗明</td>
+      <td>薰聲</td>
+      <td>欣仁</td>
+      <td>萬隆</td>
+      <td>季如</td>
+      <td>凱鈞</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>2026-03-15</td>
+      <td>莞茹</td>
+      <td>李惠知牧師</td>
+      <td>以帆、至忠、儇齊、為聖</td>
+      <td></td>
+      <td>琴:可馨｜吉:紹華｜鼓:睿甫｜斯:至忠</td>
+      <td>宗明</td>
+      <td></td>
+      <td>莞茹</td>
+      <td>宇睿</td>
+      <td>薰聲</td>
+      <td>盈君</td>
+      <td>昶翰</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>2026-03-22</td>
+      <td>季如</td>
+      <td>謝尚儒傳道</td>
+      <td>伶安</td>
+      <td>孟璇、昶翰</td>
+      <td>琴:睿甫｜吉:文祺｜鼓:為聖｜斯:以帆</td>
+      <td>惠知</td>
+      <td></td>
+      <td>湘絨</td>
+      <td>至忠</td>
+      <td>欣仁</td>
+      <td>雅親</td>
+      <td>盈君</td>
+      <td></td>
+    </tr>
+
+    <tr>
+      <td>2026-03-29</td>
+      <td>孟璇</td>
+      <td>高詩清牧師</td>
+      <td>文祺</td>
+      <td>紹華、榕榕</td>
+      <td>琴:遠晟｜吉:以帆｜鼓:儇齊｜斯:響萱</td>
+      <td>昶翰</td>
+      <td></td>
+      <td>欣仁</td>
+      <td>睿甫</td>
+      <td>萬隆</td>
+      <td>湘絨</td>
+      <td>宇睿</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+<script>
+const table = document.getElementById("roster");
+const select = document.getElementById("personSelect");
+const clearBtn = document.getElementById("clearBtn");
+const occCount = document.getElementById("occCount");
+const dayCount = document.getElementById("dayCount");
+const names = buildNameList();
+const filterInput = document.getElementById("personFilter");
+const allNames = buildNameList();
+
+names.forEach(n => {
+  const opt = document.createElement("option");
+  opt.value = n;
+  opt.textContent = n;
+  select.appendChild(opt);
+});
+
+select.addEventListener("change", () => applyHighlight(select.value));
+clearBtn.addEventListener("click",()=>{
+  filterInput.value = "";
+  renderSelect("");
+  select.value="";
+  clearHighlight();
+});
+
+function norm(s){
+  return String(s||"").replace(/\s+/g," ").trim();
+}
+function escapeRegExp(s){
+  return s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+}
+function cellHasName(text, name){
+  const t = norm(text);
+  const n = norm(name);
+  if(!t || !n) return false;
+
+  if(t.includes(":") || t.includes("：")){
+    return t.split(/[｜|]/).some(part=>{
+      const seg = part.split(/[:：]/);
+      if(seg.length >= 2){
+        return norm(seg.slice(1).join(":")) === n;
+      }
+      return false;
+    });
+  }
+
+  if(t === n) return true;
+  const re = new RegExp(`(^|[、,，/\\s｜])${escapeRegExp(n)}([、,，/\\s｜]|$)`);
+  return re.test(t);
+}
+
+
+function clearHighlight(){
+  table.querySelectorAll(".highlight").forEach(td=>td.classList.remove("highlight"));
+  table.querySelectorAll("tr").forEach(tr=>tr.classList.remove("row-hit"));
+  occCount.textContent = "出現次數：0";
+  dayCount.textContent = "有幾天：0";
+}
+
+function applyHighlight(name){
+  clearHighlight();
+  if(!name) return;
+
+  let occ = 0;
+  const days = new Set();
+
+  table.querySelectorAll("tbody tr").forEach(tr=>{
+    const tds = tr.querySelectorAll("td");
+    if(!tds.length) return;
+
+    const date = norm(tds[0].textContent);
+    let hitRow = false;
+
+    tds.forEach((td,i)=>{
+      if(i===0) return;
+      if(cellHasName(td.textContent, name)){
+        td.classList.add("highlight");
+        occ++;
+        hitRow = true;
+      }
+    });
+
+    if(hitRow){
+      tr.classList.add("row-hit");
+      if(date) days.add(date);
+    }
+  });
+
+  occCount.textContent = `出現次數：${occ}`;
+  dayCount.textContent = `有幾天：${days.size}`;
+}
+
+function extractNamesFromCell(text, isBand){
+  const result = [];
+  const t = norm(text);
+  if(!t) return result;
+
+  if(isBand){
+    t.split(/[｜|]/).forEach(part=>{
+      const seg = part.split(/[:：]/);
+      if(seg.length >= 2){
+        const name = norm(seg.slice(1).join(":"));
+        if(name) result.push(name);
+      }
+    });
+  }else{
+    t.split(/[、,，/｜]/).forEach(n=>{
+      n = norm(n);
+      if(n) result.push(n);
+    });
+  }
+
+  return result;
+}
+
+function buildNameList(){
+  const set = new Set();
+  const headers = Array.from(
+    table.querySelectorAll("thead th")
+  ).map(th => norm(th.textContent));
+
+  table.querySelectorAll("tbody tr").forEach(tr=>{
+    const tds = Array.from(tr.querySelectorAll("td"));
+    if(!tds.length) return;
+
+    for(let c=1;c<tds.length && c<headers.length;c++){
+      const header = headers[c];
+      const cellText = tds[c].textContent;
+
+      if(header === "講員" || header === "備註") continue;
+
+      if(header === "樂團"){
+        extractNamesFromCell(cellText, true).forEach(n=>set.add(n));
+      }else{
+        extractNamesFromCell(cellText, false).forEach(n=>set.add(n));
+      }
+    }
+  });
+
+  return Array.from(set).sort((a,b)=>a.localeCompare(b,"zh-Hant"));
+}
+function renderSelect(filterText){
+  const keep = norm(filterText).toLowerCase();
+
+  while(select.options.length > 1){
+    select.remove(1);
+  }
+
+  allNames
+    .filter(n => !keep || n.toLowerCase().includes(keep))
+    .forEach(n => {
+      const opt = document.createElement("option");
+      opt.value = n;
+      opt.textContent = n;
+      select.appendChild(opt);
+    });
+}
+
+renderSelect("");
+
+filterInput.addEventListener("input", () => {
+  const current = select.value;
+  renderSelect(filterInput.value);
+
+  if(current && Array.from(select.options).some(o => o.value === current)){
+    select.value = current;
+  }else{
+    select.value = "";
+    clearHighlight();
+  }
+});
+
+filterInput.addEventListener("keydown", (e) => {
+  if(e.key === "Enter"){
+    if(select.options.length === 2){
+      select.value = select.options[1].value;
+      applyHighlight(select.value);
+    }
+  }
+});
+
+</script>
+
