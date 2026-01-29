@@ -6,73 +6,316 @@
   <title>教會事奉表</title>
 
   <style>
-    .row-hit td { background: #E8F2FF; }
-    td.highlight { background: #eed85a; font-weight:600; }
+    :root{
+      --bg:#ffffff;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --line2:#eef2f7;
+      --brand:#2563eb;
+      --brand2:#1d4ed8;
+
+      --hitRow: rgba(37,99,235,.07);
+      --hitCell: #fff2b3;
+      --hitCellBorder: #f6d55c;
+
+      --shadow: 0 10px 30px rgba(17,24,39,.08);
+      --radius: 14px;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC",
+                   "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
+      color:var(--text);
+      background: radial-gradient(1000px 400px at 10% 0%, rgba(37,99,235,.12), transparent 60%),
+                  radial-gradient(900px 420px at 90% 10%, rgba(29,78,216,.10), transparent 60%),
+                  var(--bg);
+    }
+
+    .container{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .titlebar{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin: 4px 0 12px;
+    }
+    .titlebar h1{
+      margin:0;
+      font-size: 18px;
+      letter-spacing:.2px;
+    }
+    .titlebar .sub{
+      margin:2px 0 0;
+      color:var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
 
     .controls{
       display:flex;
       flex-wrap:wrap;
-      align-items:center;
+      align-items:flex-end;
       gap:10px;
-      margin-bottom:12px;
-      padding:10px;
-      background:#fff;
-      position:sticky;
-      top:0;
-      z-index:20;
-      border-bottom:1px solid #eee;
-    }
-    .controls select,
-    .controls input,
-    .controls button{
-      font-size:16px;
-      padding:10px 12px;
+      padding:12px;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
 
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 220px;
+    }
+    .field label{
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    select, input{
+      width:100%;
+      appearance:none;
+      border:1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 15px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      box-shadow: 0 1px 0 rgba(17,24,39,.02);
+    }
+    input::placeholder{ color:#9ca3af; }
+    select:focus, input:focus{
+      border-color: rgba(37,99,235,.45);
+      box-shadow: 0 0 0 4px rgba(37,99,235,.15);
+    }
+
+    .btns{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    button{
+      border:1px solid var(--line);
+      background:#fff;
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 15px;
+      cursor:pointer;
+      transition: transform .05s ease, box-shadow .2s ease, border-color .2s ease;
+      box-shadow: 0 6px 14px rgba(17,24,39,.05);
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:active{ transform: translateY(1px); }
+
+    #exportIcsBtn{
+      background: linear-gradient(180deg, var(--brand), var(--brand2));
+      color:#fff;
+      border-color: transparent;
+      box-shadow: 0 12px 22px rgba(37,99,235,.25);
+    }
+
+    .stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-left:auto;
+    }
+    .pill{
+      font-size: 13px;
+      background:#fff;
+      border:1px solid var(--line);
+      padding: 8px 10px;
+      border-radius: 999px;
+      box-shadow: 0 6px 14px rgba(17,24,39,.04);
+      white-space: nowrap;
+    }
+    .pill strong{ font-weight: 900; }
+
     .table-wrap{
+      margin-top: 12px;
       overflow-x:auto;
+      overflow-y: visible;
       -webkit-overflow-scrolling:touch;
-      border:1px solid #eee;
-      border-radius:10px;
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
     }
+
     table{
-      border-collapse:collapse;
-      width:max-content;
-      min-width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      width: max-content;
+      min-width: 100%;
+      font-size: 14px;
     }
-    th, td{
-      border:1px solid #ddd;
-      padding:10px 12px;
-      white-space:nowrap;
-      text-align:left;
-    }
+
+    /* ✅ 重點：表頭不要 sticky，避免「被往下推」壓到 1-11 */
     thead th{
-      background:#f6f6f6;
+      position: static;
+      background: linear-gradient(180deg, #ffffff, #f8fafc);
+      color:#0f172a;
+      text-align:left;
+      border-bottom:1px solid var(--line);
+      padding: 12px 12px;
+      white-space: nowrap;
+      z-index: 1;
+    }
+
+    th, td{
+      border-bottom:1px solid var(--line2);
+      padding: 12px 12px;
+      white-space: nowrap;
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) td{
+      background: rgba(248,250,252,.65);
+    }
+    tbody tr:hover td{
+      background: rgba(17,24,39,.02);
+    }
+
+
+    /* ✅ 日期欄仍然 sticky（好用） */
+    tbody td:first-child, thead th:first-child{
+      position: sticky;
+      left: 0;
+      z-index: 5;
+      background: #fff;
+      border-right: 1px solid var(--line);
+      font-weight: 800;
+    }
+    tbody tr:nth-child(even) td:first-child{
+      background: #fff;
+    }
+
+    @media (max-width: 640px){
+      .field{ min-width: 160px; }
+      .titlebar{ flex-direction:column; align-items:flex-start; }
+    }
+
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(15,23,42,.45);
+      z-index:9999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+    .modal{
+      background: rgba(255,255,255,.9);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      max-width: 460px;
+      width: 100%;
+      max-height: 75vh;
+      overflow: auto;
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+    .modal h3{
+      margin: 6px 8px 4px;
+      font-size: 16px;
+    }
+    .modal p{
+      margin: 0 8px 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .modal .modal-btn{
+      width:100%;
+      padding: 10px 12px;
+      margin: 6px 0;
+      border-radius: 12px;
+    }
+    .modal .primary{
+      background: linear-gradient(180deg, var(--brand), var(--brand2));
+      color:#fff;
+      border-color: transparent;
+      box-shadow: 0 12px 22px rgba(37,99,235,.22);
+    }
+
+    .row-hit td{ background: var(--hitRow); }
+    td.highlight{
+      background: #fff2b3;
+      font-weight: 800;
+      box-shadow: inset 0 0 0 2px #f6d55c;
+    }
+    /* 讓 highlight 背景永遠贏過斑馬紋 / hover / row-hit */
+    tbody td.highlight{
+      background: var(--hitCell) !important;
+    }
+
+    /* row-hit 只影響沒有 highlight 的格子 */
+    tbody tr.row-hit td{
+      background: var(--hitRow);
+    }
+    tbody tr.row-hit td.highlight{
+      background: var(--hitCell) !important;
     }
   </style>
 </head>
 
 <body>
+  <div class="container">
+    <div class="titlebar">
+      <div>
+        <h1>教會事奉表</h1>
+        <div class="sub">選人或輸入任一字即可高亮；也可匯出到行事曆（ICS）</div>
+      </div>
+    </div>
 
-  <div class="controls">
-    <label>
-      選擇同工：
-      <select id="personSelect">
-        <option value="">（請選擇）</option>
-      </select>
-    </label>
+    <div class="controls">
+      <div class="field">
+        <label for="personSelect">選擇同工</label>
+        <select id="personSelect">
+          <option value="">（請選擇）</option>
+        </select>
+      </div>
 
-    <label>
-      搜尋：
-      <input id="personFilter" type="text" placeholder="輸入任一字…" autocomplete="off">
-    </label>
+      <div class="field">
+        <label for="personFilter">搜尋</label>
+        <input id="personFilter" type="text" placeholder="輸入任一字…" autocomplete="off">
+      </div>
 
-    <button id="clearBtn" type="button">清除</button>
+      <div class="btns">
+        <button id="clearBtn" type="button">清除</button>
+        <button id="exportIcsBtn" type="button">加入到日曆</button>
+      </div>
 
-    <span id="occCount">出現次數：0</span>
-    <span id="dayCount">有幾天：0</span>
-    <span id="hitPeople" style="margin-left:8px;">命中人數：0</span>
-  </div>
+      <div class="stats">
+        <span id="occCount" class="pill">出現次數：<strong>0</strong></span>
+        <span id="dayCount" class="pill">有幾天：<strong>0</strong></span>
+        <span id="hitPeople" class="pill">人數：<strong>0</strong></span>
+      </div>
+    </div>
 
   <div class="table-wrap">
     <table id="roster">
@@ -245,7 +488,7 @@
           <td>小以琳</td>
           <td>琴:可馨｜吉:宗明｜鼓:為聖｜斯:季如</td>
           <td>昶翰</td>
-          <td>文祺&凱鈞</td>
+          <td>文祺、凱鈞</td>
           <td>盈君</td>
           <td>欣仁</td>
           <td>萬隆</td>
@@ -260,7 +503,7 @@
           <td>李惠知牧師</td>
           <td>可馨</td>
           <td>孟璇、昶翰</td>
-          <td>琴:伶安｜吉:紹華｜鼓:睿甫｜斯:響萱<td>
+          <td>琴:伶安｜吉:紹華｜鼓:睿甫｜斯:響萱</td>
           <td>文祺</td>
           <td></td>
           <td>欣仁</td>
@@ -313,6 +556,7 @@ const table = document.getElementById("roster");
 const select = document.getElementById("personSelect");
 const filterInput = document.getElementById("personFilter");
 const clearBtn = document.getElementById("clearBtn");
+const exportIcsBtn = document.getElementById("exportIcsBtn");
 const occCount = document.getElementById("occCount");
 const dayCount = document.getElementById("dayCount");
 const hitPeople = document.getElementById("hitPeople");
@@ -366,9 +610,9 @@ function cellHasName(text, name){
 function clearHighlight(){
   table.querySelectorAll(".highlight").forEach(td=>td.classList.remove("highlight"));
   table.querySelectorAll("tbody tr").forEach(tr=>tr.classList.remove("row-hit"));
-  occCount.textContent = "出現次數：0";
-  dayCount.textContent = "有幾天：0";
-  hitPeople.textContent = "命中人數：0";
+  occCount.querySelector("strong").textContent = "0";
+  dayCount.querySelector("strong").textContent = "0";
+  hitPeople.querySelector("strong").textContent = "0";
 }
 
 function getHeaders(){
@@ -383,7 +627,6 @@ function buildNameList(){
     const tds = Array.from(tr.children).filter(el => el.tagName === "TD");
     if(!tds.length) return;
 
-    // 跳過春節暫停列（colspan 很大）
     if(tds.length >= 2 && (tds[1].colSpan || 1) > 1) return;
 
     let col = 0;
@@ -397,8 +640,8 @@ function buildNameList(){
         continue;
       }
 
-      const t = norm(text);
-      if(t.includes("暫停") || t.includes("春節主日")){
+      const tt = norm(text);
+      if(tt.includes("暫停") || tt.includes("春節主日")){
         col += span;
         continue;
       }
@@ -418,7 +661,6 @@ function buildNameList(){
 
 const allNames = buildNameList();
 
-/* 建立 select 名單（全名單，不跟 input 互相綁死） */
 function fillSelect(){
   while(select.options.length > 1) select.remove(1);
   allNames.forEach(n=>{
@@ -430,7 +672,6 @@ function fillSelect(){
 }
 fillSelect();
 
-/* 你要的：打一個字就 highlight 多個人 */
 function applyHighlightMany(names){
   clearHighlight();
   const list = Array.from(new Set((names||[]).map(norm).filter(Boolean)));
@@ -446,12 +687,10 @@ function applyHighlightMany(names){
     const date = norm(tds[0].textContent);
     let hitRow = false;
 
-    // 從第 2 格開始掃（跳過日期）
     for(let i=1;i<tds.length;i++){
       const td = tds[i];
       const text = td.textContent;
 
-      // 任何一個名字命中就標記該格
       let hitCell = false;
       for(const name of list){
         if(cellHasName(text, name)){
@@ -473,34 +712,28 @@ function applyHighlightMany(names){
     }
   });
 
-  occCount.textContent = `出現次數：${occ}`;
-  dayCount.textContent = `有幾天：${days.size}`;
-  hitPeople.textContent = `命中人數：${list.length}`;
+  occCount.querySelector("strong").textContent = String(occ);
+  dayCount.querySelector("strong").textContent = String(days.size);
+  hitPeople.querySelector("strong").textContent = String(list.length);
 }
 
-/* input：即時搜尋（含任一字就算） */
 filterInput.addEventListener("input", () => {
   const q = norm(filterInput.value).toLowerCase();
 
-  // 空字串 -> 清掉
   if(!q){
     select.value = "";
     clearHighlight();
     return;
   }
 
-  // 找出「名字包含 q」的所有人
   const matches = allNames.filter(n => n.toLowerCase().includes(q));
-
-  // 你說「反正就 highlight 全部」：就算很多人也照亮
   select.value = "";
   applyHighlightMany(matches);
 });
 
-/* select：選單選單一人（精準 highlight） */
 select.addEventListener("change", () => {
   const v = norm(select.value);
-  filterInput.value = v;      // 同步填回 input，方便使用者看
+  filterInput.value = v;
   if(!v){
     clearHighlight();
     return;
@@ -508,11 +741,255 @@ select.addEventListener("change", () => {
   applyHighlightMany([v]);
 });
 
-/* clear */
 clearBtn.addEventListener("click", () => {
   filterInput.value = "";
   select.value = "";
   clearHighlight();
+});
+
+function pad2(n){ return String(n).padStart(2,"0"); }
+
+function toIcsDateTimeLocal(dateStr, hh=9, mm=0){
+  const d = new Date(dateStr + "T00:00:00");
+  d.setHours(hh, mm, 0, 0);
+  const y = d.getFullYear();
+  const m = pad2(d.getMonth()+1);
+  const da = pad2(d.getDate());
+  const H = pad2(d.getHours());
+  const M = pad2(d.getMinutes());
+  const S = pad2(d.getSeconds());
+  return `${y}${m}${da}T${H}${M}${S}`;
+}
+
+function icsEscape(s){
+  return String(s||"")
+    .replace(/\\/g,"\\\\")
+    .replace(/\n/g,"\\n")
+    .replace(/,/g,"\\,")
+    .replace(/;/g,"\\;");
+}
+
+function uid(){
+  return (crypto?.randomUUID?.() || (Date.now()+"-"+Math.random().toString(16).slice(2))) + "@roster";
+}
+
+function buildEventsForPerson(personName){
+  const name = norm(personName);
+  if(!name) return [];
+
+  const headers = getHeaders();
+  const events = [];
+
+  table.querySelectorAll("tbody tr").forEach(tr=>{
+    const tds = Array.from(tr.querySelectorAll("td"));
+    if(!tds.length) return;
+
+    const date = norm(tds[0].textContent);
+    if(!date) return;
+
+    const roles = [];
+
+    for(let i=1;i<tds.length;i++){
+      const header = headers[i] || "";
+      if(header === "講員" || header === "備註") continue;
+
+      const text = tds[i].textContent;
+
+      if(header === "樂團"){
+        const bandNames = extractNamesFromCell(text, true);
+        if(bandNames.includes(name)) roles.push("樂團");
+      }else{
+        if(cellHasName(text, name)) roles.push(header);
+      }
+    }
+
+    if(!roles.length) return;
+
+    events.push({ date, roles });
+  });
+
+  return events;
+}
+
+function buildIcs(personName, events){
+  const now = new Date();
+  const y = now.getUTCFullYear();
+  const m = pad2(now.getUTCMonth()+1);
+  const d = pad2(now.getUTCDate());
+  const H = pad2(now.getUTCHours());
+  const M = pad2(now.getUTCMinutes());
+  const S = pad2(now.getUTCSeconds());
+  const dtstamp = `${y}${m}${d}T${H}${M}${S}Z`;
+
+  const lines = [];
+  lines.push("BEGIN:VCALENDAR");
+  lines.push("VERSION:2.0");
+  lines.push("PRODID:-//Church Roster//ICS Export//ZH");
+  lines.push("CALSCALE:GREGORIAN");
+  lines.push("METHOD:PUBLISH");
+
+  events.forEach(ev=>{
+    const dtstart = toIcsDateTimeLocal(ev.date, 10, 30);
+    const dtend   = toIcsDateTimeLocal(ev.date, 12, 0);
+    const summary = `教會事奉：${ev.roles.join("／")}`;
+    const desc    = `同工：${personName}\n日期：${ev.date}\n服事：${ev.roles.join("、")}`;
+
+    lines.push("BEGIN:VEVENT");
+    lines.push(`UID:${uid()}`);
+    lines.push(`DTSTAMP:${dtstamp}`);
+    lines.push(`DTSTART:${dtstart}`);
+    lines.push(`DTEND:${dtend}`);
+    lines.push(`SUMMARY:${icsEscape(summary)}`);
+    lines.push(`DESCRIPTION:${icsEscape(desc)}`);
+    lines.push("END:VEVENT");
+  });
+
+  lines.push("END:VCALENDAR");
+  return lines.join("\r\n");
+}
+
+function downloadText(filename, text){
+  const blob = new Blob([text], {type:"text/calendar;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function resolvePeopleForExport(){
+  const fromSelect = norm(select.value);
+  if(fromSelect) return [fromSelect];
+
+  const q = norm(filterInput.value);
+  if(!q) return [];
+
+  const exact = allNames.find(n => norm(n) === q);
+  if(exact) return [exact];
+
+  const qLower = q.toLowerCase();
+  return allNames.filter(n => n.toLowerCase().includes(qLower));
+}
+
+function pickOneFromList(list){
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+
+    const box = document.createElement("div");
+    box.className = "modal";
+
+    const title = document.createElement("h3");
+    title.textContent = "選擇要匯出的同工";
+
+    const tip = document.createElement("p");
+    tip.textContent = `目前搜尋命中 ${list.length} 人，請點選其中一位：`;
+
+    const btnAll = document.createElement("button");
+    btnAll.type = "button";
+    btnAll.textContent = "匯出全部命中";
+    btnAll.className = "modal-btn primary";
+
+    const listWrap = document.createElement("div");
+
+    const cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.textContent = "取消";
+    cancel.className = "modal-btn";
+
+    btnAll.addEventListener("click", () => { overlay.remove(); resolve(list); });
+    cancel.addEventListener("click", () => { overlay.remove(); resolve(null); });
+
+    list.forEach(name => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = name;
+      b.className = "modal-btn";
+      b.addEventListener("click", () => { overlay.remove(); resolve([name]); });
+      listWrap.appendChild(b);
+    });
+
+    overlay.addEventListener("click", (e) => {
+      if(e.target === overlay){ overlay.remove(); resolve(null); }
+    });
+
+    box.appendChild(title);
+    box.appendChild(tip);
+    box.appendChild(btnAll);
+    box.appendChild(listWrap);
+    box.appendChild(cancel);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+  });
+}
+
+exportIcsBtn.addEventListener("click", async () => {
+  let candidates = resolvePeopleForExport();
+
+  if(!candidates.length){
+    alert("請在搜尋框輸入同工名字（可輸入一個字也行），再按匯出 ICS。");
+    return;
+  }
+
+  if(candidates.length > 1){
+    const picked = await pickOneFromList(candidates);
+    if(!picked) return;
+    candidates = picked;
+  }
+
+  if(candidates.length === 1){
+    const person = candidates[0];
+    const events = buildEventsForPerson(person);
+    if(!events.length){
+      alert("這位同工在表格中沒有找到服事紀錄。");
+      return;
+    }
+    const ics = buildIcs(person, events);
+    const safeName = person.replace(/[\\/:*?"<>|]/g,"_");
+    downloadText(`教會事奉表-${safeName}.ics`, ics);
+    return;
+  }
+
+  const mergedLines = [];
+  mergedLines.push("BEGIN:VCALENDAR");
+  mergedLines.push("VERSION:2.0");
+  mergedLines.push("PRODID:-//Church Roster//ICS Export//ZH");
+  mergedLines.push("CALSCALE:GREGORIAN");
+  mergedLines.push("METHOD:PUBLISH");
+
+  const now = new Date();
+  const y = now.getUTCFullYear();
+  const mo = pad2(now.getUTCMonth()+1);
+  const da = pad2(now.getUTCDate());
+  const H = pad2(now.getUTCHours());
+  const M = pad2(now.getUTCMinutes());
+  const S = pad2(now.getUTCSeconds());
+  const dtstamp = `${y}${mo}${da}T${H}${M}${S}Z`;
+
+  candidates.forEach(person => {
+    const events = buildEventsForPerson(person);
+    events.forEach(ev => {
+      const dtstart = toIcsDateTimeLocal(ev.date, 10, 30);
+      const dtend   = toIcsDateTimeLocal(ev.date, 12, 0);
+      const summary = `教會事奉：${person}（${ev.roles.join("／")}）`;
+      const desc    = `同工：${person}\n日期：${ev.date}\n服事：${ev.roles.join("、")}`;
+
+      mergedLines.push("BEGIN:VEVENT");
+      mergedLines.push(`UID:${uid()}`);
+      mergedLines.push(`DTSTAMP:${dtstamp}`);
+      mergedLines.push(`DTSTART:${dtstart}`);
+      mergedLines.push(`DTEND:${dtend}`);
+      mergedLines.push(`SUMMARY:${icsEscape(summary)}`);
+      mergedLines.push(`DESCRIPTION:${icsEscape(desc)}`);
+      mergedLines.push("END:VEVENT");
+    });
+  });
+
+  mergedLines.push("END:VCALENDAR");
+  downloadText(`教會事奉表-搜尋命中${candidates.length}人.ics`, mergedLines.join("\r\n"));
 });
 </script>
 
